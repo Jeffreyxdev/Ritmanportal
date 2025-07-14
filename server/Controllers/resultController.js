@@ -12,7 +12,15 @@ export const createResult = async (req, res) => {
       return res.status(404).json({ message: 'Student not found' });
     }
 
-    const course = await Course.findById(courseId);
+    let course;
+    // Check if courseId is a valid ObjectId
+    if (/^[0-9a-fA-F]{24}$/.test(courseId)) {
+      course = await Course.findById(courseId);
+    }
+    // If not, try to find by course code
+    if (!course) {
+      course = await Course.findOne({ courseCode: courseId });
+    }
     if (!course) {
       return res.status(404).json({ message: 'Course not found' });
     }
