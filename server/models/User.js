@@ -25,6 +25,9 @@ const userSchema = new mongoose.Schema(
     matricNumber: {
       type: String,
       unique: true,
+     required: function () {
+    return this.role === 'student';
+  }, // required for students
       sparse: true, // allow null for admin
     },
     faculty: String,
