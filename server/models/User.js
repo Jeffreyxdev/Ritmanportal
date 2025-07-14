@@ -6,43 +6,71 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+
     email: {
       type: String,
       required: true,
       unique: true,
     },
+
     password: {
       type: String,
       required: true,
     },
+
     role: {
       type: String,
       enum: ['student', 'admin'],
       default: 'student',
     },
 
-    // 🎓 Student-only fields (can be left empty for admins)
     matricNumber: {
       type: String,
       unique: true,
-     required: function () {
-    return this.role === 'student';
-  }, // required for students
-      sparse: true, // allow null for admin
+      sparse: true,
+      required: function () {
+        return this.role === 'student';
+      }
     },
+
     faculty: String,
     department: String,
     level: String, // e.g. "100", "200", "Final Year"
+    course: String,
+
     phone: String,
+    gender: String,
+    dob: String,
+    address: String,
+
     profilePhoto: String, // store URL or filename
 
-    // Optional: references to Course documents
+    jambRegistrationNumber: String,
+    jambScore: Number,
+
+    oLevelResults: [
+      {
+        subject: String,
+        grade: String, // e.g. A, B, C
+        year: Number,
+      }
+    ],
+    oLevelCertificate: String,   // URL or filename
+    birthCertificate: String,    // URL or filename
+
+    stateOfOrigin: String,
+    localGovernmentArea: String,
+
     courses: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Course',
       }
     ],
+
+    // 🔐 Password Reset
+    resetToken: String,
+    resetTokenExpiry: Date
   },
   { timestamps: true }
 );

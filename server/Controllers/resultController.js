@@ -33,7 +33,7 @@ export const createResult = async (req, res) => {
 };
 
 // Admin: Get all results
-export const getAllResults = async (req, res) => {
+export const getAllResults = async (_, res) => {
   const results = await Result.find().populate('student course');
   res.json(results);
 };

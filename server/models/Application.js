@@ -1,10 +1,8 @@
 import mongoose from 'mongoose';
 
-const applicationSchema = new mongoose.Schema(
-  {
- 
+const applicationSchema = new mongoose.Schema({
   fullName: String,
-  email: String,
+  email: { type: String, required: true },
   phone: String,
   gender: String,
   dob: String,
@@ -13,15 +11,8 @@ const applicationSchema = new mongoose.Schema(
   faculty: String,
   department: String,
   level: String,
-  profilePhoto: String,
-
-  matricNumber: {
-    type: String,
-    unique: true,
-    required: true,
-    sparse: true,
-  },
   jambRegistrationNumber: String,
+  jambScore: Number,
   oLevelResults: [
     {
       subject: String,
@@ -33,26 +24,11 @@ const applicationSchema = new mongoose.Schema(
   birthCertificate: String,
   stateOfOrigin: String,
   localGovernmentArea: String,
-  jambScore: Number,
-
   status: {
     type: String,
-    enum: ['pending', 'accepted', 'rejected'],
+    enum: ['pending', 'approved', 'rejected'],
     default: 'pending'
-  },
-
-  password: {
-    type: String,
-    required: true
-  },
-
-  role: {
-    type: String,
-    enum: ['student', 'admin'],
-    default: 'student'
   }
-},{ timestamps: true });
+}, { timestamps: true });
 
-
-const Application = mongoose.model('Application', applicationSchema);
-export default Application;
+export default mongoose.model('Application', applicationSchema);
