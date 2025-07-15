@@ -37,6 +37,7 @@ const LoginForm = () => {
        email,
       password,
     });
+    localStorage.setItem("studentId", response.data.user._id);
 
     const { user, token } = response.data;
         if (!user?.role) {

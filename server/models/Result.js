@@ -7,6 +7,8 @@ const resultSchema = new mongoose.Schema(
       ref: 'User',
       required: true,
     },
+    ca: Number,
+    exam: Number,
     course: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Course',
@@ -28,7 +30,11 @@ const resultSchema = new mongoose.Schema(
     session: {
       type: String,
       required: true, // e.g. "2024/2025"
-    }
+    },
+    level: {
+      type: String,
+      required: false, // optional if you want to infer it from course/student
+    },
   },
   { timestamps: true }
 );

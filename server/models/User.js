@@ -17,7 +17,12 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-
+ semester: {
+      type: String,
+      required: true,
+      enum: ["1st Semester", "2nd Semester"],
+      default: "1st Semester",
+    },
     role: {
       type: String,
       enum: ['student', 'admin'],
@@ -35,9 +40,25 @@ const userSchema = new mongoose.Schema(
 
     faculty: String,
     department: String,
-    level: String, // e.g. "100", "200", "Final Year"
-    course: String,
-
+    level: {
+  type: String,
+  required: true
+},
+    course: {
+  type: String,
+  required: true,
+  trim: true
+},
+session: {
+  type: String,
+  required: true,
+  enum: ["2022/2023", "2023/2024", "2024/2025", 
+        "2025/2026","2026/2027","2027/2028","2028/2029",
+        "2029/2030","2030/2031"], // Add more sessions as needed
+  trim: true
+},
+ // e.g. "2023/2024"
+ 
     phone: String,
     gender: String,
     dob: String,
@@ -61,12 +82,19 @@ const userSchema = new mongoose.Schema(
     stateOfOrigin: String,
     localGovernmentArea: String,
 
-    courses: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Course',
-      }
-    ],
+   courses: [
+  {
+    code: String,
+    title: String,
+    unit: Number,
+  }
+],
+    cgpa: {
+      type: Number,
+      default: 0.0,
+    },
+
+
 
     // 🔐 Password Reset
     resetToken: String,

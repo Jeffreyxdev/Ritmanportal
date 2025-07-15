@@ -4,7 +4,7 @@ import authRoutes from './routes/authRoutes.js';
 import courseRoutes from './routes/CourseRoutes.js';
 
 import resultRoutes from './routes/resultRoutes.js';
-
+import studentRoutes from './routes/StudentRoutes.js';
 import applicationRoutes from './routes/ApplicationRoutes.js';
 
 
@@ -22,6 +22,7 @@ app.use('/api/courses', courseRoutes);
 app.get('/', (req, res) => {
   res.send('Welcome to the Ritman Portal API');
 });
+app.use('/api/student', studentRoutes);
 app.use('/api/results', resultRoutes);
 app.use('/api/applications', applicationRoutes);
 

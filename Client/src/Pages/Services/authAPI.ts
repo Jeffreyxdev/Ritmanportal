@@ -24,4 +24,15 @@ export const loginUser = (credentials: AuthCredentials) =>
 export const registerUser = (credentials: AuthCredentials) =>
   API.post('/auth/register', credentials);
 
+
+
+export const getStudentProfile = async () => {
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const userId = user._id;
+
+  if (!userId) throw new Error("User ID not found in localStorage");
+
+  const res = await axios.get(`http://localhost:5000/api/student/${userId}`);
+  return res.data;
+};
 export default API;

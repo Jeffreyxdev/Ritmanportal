@@ -5,7 +5,7 @@ import Course from '../models/Course.js';
 // Create a result by regNumber and courseId
 export const createResult = async (req, res) => {
   try {
-    const { regNumber, courseId, score, grade, semester, session } = req.body;
+    const { regNumber, courseId, score, grade, semester, session, ca, exam } = req.body;
 
     const student = await User.findOne({ regNumber });
     if (!student) {
@@ -30,12 +30,16 @@ export const createResult = async (req, res) => {
       course: course._id,
       score,
       grade,
+      ca,            // Optional, frontend can pass it or not
+      exam,          // Optional
       semester,
-      session
+      session,
+      level: student.level || course.level || undefined, // fallback options
     });
 
     res.status(201).json(result);
   } catch (error) {
+    console.error("Result creation failed:", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -46,11 +50,18 @@ export const getAllResults = async (_, res) => {
   res.json(results);
 };
 
-// Student: Get their own results
 export const getStudentResults = async (req, res) => {
   const studentId = req.user.id;
-  const results = await Result.find({ student: studentId }).populate('course');
-  res.json(results);
+  const { semester, level } = req.query;
+
+  const student = await User.findById(studentId).select("fullName department level");
+  const filter = { student: studentId };
+  if (semester) filter.semester = semester;
+  if (level) filter.level = level;
+
+  const results = await Result.find(filter).populate("course");
+
+  res.json({ student, results });
 };
 
 // Admin: Update a result by ID
