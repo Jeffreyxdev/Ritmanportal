@@ -1,11 +1,13 @@
-import{ createContext, useState } from 'react';
-import type {  ReactNode, FC } from 'react';
+import React, { createContext, useContext, useState, ReactNode, FC } from 'react';
 import { useNavigate } from 'react-router-dom';
-import React from 'react';
+
 interface User {
   role: string;
-  // add other user properties as needed
+  fullName?: string;
+  email?: string;
+  matricNumber?: string;
 }
+
 
 interface AuthContextType {
   user: User | null;
@@ -14,7 +16,7 @@ interface AuthContextType {
   logout: () => void;
 }
 
-export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -23,25 +25,31 @@ interface AuthProviderProps {
 export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
   const navigate = useNavigate();
 
-  // Load user from localStorage on first render
-  const [user, setUser] = useState(() => {
-    const storedUser = localStorage.getItem('user');
-    return storedUser ? JSON.parse(storedUser) : null;
+  const [user, setUser] = useState<User | null>(() => {
+    try {
+      const storedUser = localStorage.getItem('user');
+      if (!storedUser || storedUser === 'undefined') return null;
+      return JSON.parse(storedUser);
+    } catch {
+      return null;
+    }
   });
 
-  const [token, setToken] = useState(() => localStorage.getItem('token') || '');
+  const [token, setToken] = useState<string>(() => localStorage.getItem('token') || '');
 
-  // Save user & token to state + localStorage on login
-   const login = ({ user, token }: { user: User; token: string }) => {
-    setUser(user);
-    setToken(token);
-    localStorage.setItem('user', JSON.stringify(user));
-    localStorage.setItem('token', token);
+const login = ({ user, token }: { user: User; token: string }) => {
+  setUser(user);
+  setToken(token);
+  localStorage.setItem('user', JSON.stringify(user));
+  localStorage.setItem('token', token);
 
-    // Optional auto-redirect
-    navigate(`/${user.role}/dashboard`);
-  };
-
+  // ✅ Must work based on role
+  if (user.role === 'admin') {
+    navigate('/admin/dashboard');
+  } else {
+    navigate('/student/dashboard');
+  }
+};
   const logout = () => {
     setUser(null);
     setToken('');
@@ -50,11 +58,17 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     navigate('/');
   };
 
-  // Optional: token expiration handling (JWT expiry check)
-
   return (
     <AuthContext.Provider value={{ user, token, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
+};
+
+export const useAuth = (): AuthContextType => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 };

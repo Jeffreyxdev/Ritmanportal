@@ -1,3 +1,4 @@
+import React from 'react';
 const StudentDashboard = () => {
   return (
     <div className="p-4">

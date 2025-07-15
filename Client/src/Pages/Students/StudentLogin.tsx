@@ -1,65 +1,76 @@
 import { useState, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../Components/ui/button";
 import { Input } from "../Components/ui/input";
 import { Label } from "../Components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../Components/ui/card";
 import { useToast } from "../../hooks/use-toast";
 import { UserCircle, Lock, LogIn } from "lucide-react";
-import { AuthContext } from "../Content/AuthContent";
+import { useAuth } from "../Content/AuthContent";
 import React from "react";
 import { loginUser } from "../Services/authAPI"; // Path to the Axios service file
 
 const LoginForm = () => {
-  const [registrationNumber, setRegistrationNumber] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const { login } = useContext(AuthContext);
+ const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
+  e.preventDefault();
+  setIsLoading(true);
 
-    if (!registrationNumber || !password) {
-      toast({
-        title: "Missing Fields",
-        description: "Please enter both registration number and password.",
-        variant: "destructive",
-      });
-      setIsLoading(false);
-      return;
+  if (!email || !password) {
+    toast({
+      title: "Missing Fields",
+      description: "Please enter both Email Address and password.",
+      variant: "destructive",
+    });
+    setIsLoading(false);
+    return;
+  }
+
+  try {
+    const response = await loginUser({
+       email,
+      password,
+    });
+
+    const { user, token } = response.data;
+        if (!user?.role) {
+          throw new Error('Invalid user role. Cannot continue.');
+        }
+    login({ user, token }); // still saves user/token to context
+
+    toast({
+      title: "Login Successful",
+      description: `Welcome, ${user.role}!`,
+    });
+
+    // ✅ Role-based routing
+    if (user.role === "admin") {
+      navigate("/admin/dashboard");
+    } else if (user.role === "student") {
+      navigate("/student/dashboard");
+    } else {
+      navigate("/"); // fallback
     }
 
-    try {
-      const response = await loginUser({
-        email: registrationNumber,
-        password,
-      });
+  } catch (error: any) {
+    const message =
+      error.response?.data?.message || "Login failed. Check your credentials.";
+    toast({
+      title: "Login Failed",
+      description: message,
+      variant: "destructive",
+    });
+  } finally {
+    setIsLoading(false);
+  }
+};
 
-      const { user, token } = response.data;
-
-      login({ user, token });
-
-      toast({
-        title: "Login Successful",
-        description: `Welcome, ${user.role}!`,
-      });
-
-      // Redirection handled inside AuthContext
-    } catch (error: any) {
-      const message =
-        error.response?.data?.message || "Login failed. Check your credentials.";
-      toast({
-        title: "Login Failed",
-        description: message,
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   return (
     <Card className="w-full max-w-md shadow-lg border-0 bg-white/80 backdrop-blur-sm">
@@ -80,11 +91,11 @@ const LoginForm = () => {
             <div className="relative">
               <UserCircle className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
-                id="registration"
+                id="email"
                 type="text"
                 placeholder="Enter your Email address"
-                value={registrationNumber}
-                onChange={(e) => setRegistrationNumber(e.target.value)}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="pl-10 h-12 border-gray-300 focus:border-university-orange focus:ring-university-orange"
                 required
               />
@@ -128,9 +139,9 @@ const LoginForm = () => {
           </Button>
 
           <div className="text-center space-y-2">
-            <a href="#" className="text-sm text-university-orange hover:text-university-orange-dark transition-colors">
+            <Link to={'/forgot-password'} className="text-sm text-university-orange hover:text-university-orange-dark transition-colors">
               Forgot your password?
-            </a>
+            </Link>
             <div className="text-sm text-muted-foreground">
               Need help? <a href="#" className="text-university-orange hover:text-university-orange-dark transition-colors">Contact Support</a>
             </div>

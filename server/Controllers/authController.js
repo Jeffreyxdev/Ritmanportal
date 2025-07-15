@@ -152,14 +152,18 @@ export const login = async (req, res) => {
     if (!match) return res.status(400).json({ message: 'Invalid credentials' });
 
     res.json({
-      _id: user._id,
-      fullName: user.fullName,
-      email: user.email,
-      role: user.role,
-      token: generateToken(user._id)
-    });
+  user: {
+    _id: user._id,
+    fullName: user.fullName,
+    email: user.email,
+    role: user.role,
+    matricNumber: user.matricNumber
+  },
+  token: generateToken(user._id)
+});
   } catch (err) {
     res.status(500).json({ message: err.message });
+    console.log("User found?", user);
   }
 };
 
