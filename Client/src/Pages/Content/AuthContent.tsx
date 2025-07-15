@@ -1,7 +1,7 @@
 import{ createContext, useState } from 'react';
 import type {  ReactNode, FC } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import React from 'react';
 interface User {
   role: string;
   // add other user properties as needed
@@ -32,7 +32,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
   const [token, setToken] = useState(() => localStorage.getItem('token') || '');
 
   // Save user & token to state + localStorage on login
-  const login = ({ user, token }: { user: User; token: string }) => {
+   const login = ({ user, token }: { user: User; token: string }) => {
     setUser(user);
     setToken(token);
     localStorage.setItem('user', JSON.stringify(user));

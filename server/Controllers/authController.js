@@ -12,6 +12,7 @@ import generateToken from '../utils/generateToken.js';
 const getNextMatricNumber = async (department) => {
   const deptCodes = {
     'Computer Science': { faculty: '02', dept: '04' },
+    'Cyber Secuirty': {faculty: '02', dept: '09'},
     'Software Engineering': { faculty: '02', dept: '10' },
     'Information Technology': { faculty: '02', dept: '11' },
     'Mass Communication': { faculty: '03', dept: '01' },

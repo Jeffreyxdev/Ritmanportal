@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-// Extend ImportMeta interface for Vite env variables
+
+// Add this declaration to let TypeScript know about import.meta.env
 interface ImportMetaEnv {
   readonly VITE_API_BASE_URL?: string;
 }
@@ -11,7 +12,7 @@ interface ImportMeta {
 
 // Base Axios instance
 const API = axios.create({
-  baseURL: process.env.VITE_API_BASE_URL || 'http://localhost:5000/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api',
 });
 
 // Request interceptor to attach token
